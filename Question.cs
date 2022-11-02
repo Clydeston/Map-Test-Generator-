@@ -4,7 +4,6 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 
-[Flags]
 enum QUESTION_TYPE
 {
 	DISTANCE,
@@ -109,7 +108,7 @@ namespace MapTestGen
 			return g;
 		}
 
-		public void GenerateQuestion(int amount, List<Grid>Grid_List)
+		public void GenerateQuestion(int amount, List<Grid>Grid_List, List<ConventionalSign> sign_list)
 		{
 			switch(this.type)
             {
@@ -120,17 +119,25 @@ namespace MapTestGen
 					this.BearingQuestion(amount, Grid_List);
 					break;
 				case QUESTION_TYPE.CONVENTIONAL_SIGN:
-					// TODO
+					this.ConvetionalSignQuestion(amount, sign_list);
 					break;
 				case QUESTION_TYPE.DISTANCE_BEARING:					
 					this.BearingQuestion(amount/2, Grid_List);
 					this.DistanceQuestion(amount/2, Grid_List);
 					break;
 				case QUESTION_TYPE.BEARING_DISTANCE_SIGN:
+					int question_count = (amount / 3) + 1;
+					this.BearingQuestion(amount / 3, Grid_List);
+					this.ConvetionalSignQuestion(amount / 3, sign_list);
+					this.DistanceQuestion(question_count, Grid_List);
 					break;
 				case QUESTION_TYPE.BEARING_SIGN:
+					this.BearingQuestion(amount / 2, Grid_List);
+					this.ConvetionalSignQuestion(amount / 2, sign_list);
 					break;
 				case QUESTION_TYPE.DISTANCE_SIGN:
+					this.DistanceQuestion(amount / 2, Grid_List);
+					this.ConvetionalSignQuestion(amount / 2, sign_list);
 					break;
 			}
 			this.GeneratePaper();
@@ -218,8 +225,8 @@ namespace MapTestGen
 				Answers_List.Add(answer_string);
 
 				oGrid grid = new oGrid();
-				this.Source_Grid.position = grid.GetGridPosition(this.Source_Grid);
-				this.Target_Grid.position = grid.GetGridPosition(this.Target_Grid);
+				//this.Source_Grid.position = grid.GetGridPosition(this.Source_Grid);
+				//this.Target_Grid.position = grid.GetGridPosition(this.Target_Grid);
 			}
 		}
 
@@ -246,8 +253,8 @@ namespace MapTestGen
 				this.Target_Grid = this.BuildGrid(this.Target_Grid);
 
 				oGrid grid = new oGrid();
-				this.Source_Grid.position = grid.GetGridPosition(this.Source_Grid);
-				this.Target_Grid.position = grid.GetGridPosition(this.Target_Grid);
+				//this.Source_Grid.position = grid.GetGridPosition(this.Source_Grid);
+				//this.Target_Grid.position = grid.GetGridPosition(this.Target_Grid);
 
 				/*double bearing_from_src_to_dest = grid.GetBearingFromPos(this.Source_Grid.position.LATITUDE, this.Source_Grid.position.LONGITUDE,
 																		this.Target_Grid.position.LATITUDE, this.Target_Grid.position.LONGITUDE);*/
@@ -266,6 +273,25 @@ namespace MapTestGen
 				//MessageBox.Show("Bearing:" + bearing_from_src_to_dest.ToString());
 			}
 		}
+
+		private void ConvetionalSignQuestion(int amount, List<ConventionalSign> Sign_List)
+        {
+			for(int i = 1; i < amount + 1; i++)
+            {
+				ConventionalSign cs = Sign_List[this.RandomInt(0, Sign_List.Count)];
+				this.Source_Grid = cs.Grid_Reference;
+
+				string question_str;
+				string base_question = i.ToString() + ". What is the conventional sign at grid ";
+
+				question_str =  base_question + this.Source_Grid.grid_s + "\n";
+				Questions_List.Add(question_str);
+
+				string answer_string;
+				answer_string = i.ToString() + ". " + cs.Type.ToString() + "\n";
+				Answers_List.Add(answer_string);
+			}
+        }
 	};
 
 }

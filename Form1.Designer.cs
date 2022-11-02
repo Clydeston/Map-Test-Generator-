@@ -244,8 +244,9 @@ namespace MapTestGen
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 29;
-            this.dataGridView1.Size = new System.Drawing.Size(629, 187);
+            this.dataGridView1.Size = new System.Drawing.Size(756, 187);
             this.dataGridView1.TabIndex = 21;
+            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // label5
@@ -298,20 +299,21 @@ namespace MapTestGen
             this.Column2.MinimumWidth = 6;
             this.Column2.Name = "Column2";
             this.Column2.ReadOnly = true;
-            this.Column2.Width = 125;
+            this.Column2.Width = 200;
             // 
             // Column3
             // 
             this.Column3.HeaderText = "Comment";
             this.Column3.MinimumWidth = 6;
             this.Column3.Name = "Column3";
-            this.Column3.Width = 200;
+            this.Column3.Width = 300;
             // 
             // Column4
             // 
             this.Column4.HeaderText = "Column4";
             this.Column4.MinimumWidth = 6;
             this.Column4.Name = "Column4";
+            this.Column4.Visible = false;
             this.Column4.Width = 125;
             // 
             // Form1

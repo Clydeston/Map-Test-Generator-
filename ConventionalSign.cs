@@ -16,7 +16,13 @@ enum ConventionalSigns
     ELECTRIC_POLE, 
     MARSH_LAND,
     IMPORTANT_BUILDING,
-    TRAIN_STATION
+    TRAIN_STATION,
+    CHURCH_SPIRE,
+    CHURCH_TOWER,
+    SPRING,
+    BUS_STATION,
+    CLIFF,
+    MIXED_WOOD
 }
 
 namespace MapTestGen
@@ -28,8 +34,10 @@ namespace MapTestGen
         public string Filename;
         public string File_Path;
         public string Comment;
+        [JsonIgnore]
+        public DataGridView dgv;
 
-        public void CreateNewEntry()
+        public void CreateNewEntry(List<ConventionalSign> sign_list, bool silent = false)
         {
 			string grid_storage = @$"./Grids/{this.Filename}.txt";
 
@@ -53,29 +61,44 @@ namespace MapTestGen
 				// Create a new file     
 				using (StreamWriter sw = File.CreateText(grid_storage))
 				{
-                    string json_obj = JsonConvert.SerializeObject(this, Formatting.Indented);
+                    string json_obj = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    });
                     sw.WriteLine("{0}", json_obj);
 				}
 
-				MessageBox.Show("Added successfuly!");
-			}
+                if(!silent)
+				    MessageBox.Show("Added successfuly!");
+
+                DataGridViewRow row = (DataGridViewRow)dgv.Rows[0].Clone();
+                row.Cells[0].Value = this.Grid_Reference.grid_s;
+                row.Cells[1].Value = Enum.GetName(typeof(ConventionalSigns), this.Type);
+                row.Cells[3].Value = this;
+                dgv.Rows.Add(row);
+                if(sign_list != null)
+                    sign_list.Add(this);
+            }
 			catch (Exception Ex)
 			{
 				MessageBox.Show(Ex.ToString());
 			}
 		}
 
-        public void RemoveEntry()
+        public void RemoveEntry(DataGridViewRow row, List<ConventionalSign> sign_list)
         {
             try
             {
-                if (File.Exists($"./Grids/{this.Filename}"))
+                if (File.Exists($"./Grids/{this.Filename}.txt"))
                 {
                     var confirmResult = MessageBox.Show("Are you sure you want to remove this?", "Remove Entry", MessageBoxButtons.YesNo);
 
                     if (confirmResult == DialogResult.Yes)
                     {
-                        File.Delete($"./Grids/{this.Filename}");
+                        File.Delete($"./Grids/{this.Filename}.txt");
+                        dgv.Rows.Remove(row);
+                        sign_list.Remove((ConventionalSign)row.Cells[3].Value);
+                        MessageBox.Show("Deleted successfully!");
                     }
                     else
                     {
@@ -86,6 +109,55 @@ namespace MapTestGen
             catch(Exception ex)
             {
                 MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void AddComment(string comment)
+        {
+            try
+            {
+                if (File.Exists($"./Grids/{this.Filename}.txt"))
+                {
+                    string contents = "";
+                    const Int32 BufferSize = 128;
+                    using (var fileStream = File.OpenRead($"{this.Filename}.txt"))
+                    using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
+                    {
+                        String line;
+                        while ((line = streamReader.ReadLine()) != null)
+                        {
+                            contents = contents + line;
+                        }
+                    }
+                    var data = JsonConvert.DeserializeObject<ConventionalSign>(contents);
+                    data.Comment = comment;
+
+                    File.Delete($"./Grids/{this.Filename}.txt");
+                    data.CreateNewEntry(null);  
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        // untested need to add to background thread
+        public void UpdateComments()
+        {
+            foreach(DataGridViewRow row in dgv.Rows)
+            {
+                if(row.Cells[2].Value != null)
+                {
+                    ConventionalSign cs = (ConventionalSign)dgv.Rows[row.Index].Cells[3].Value;
+                    if (cs.Comment != null)
+                    {
+                        if(cs.Comment != row.Cells[2].Value.ToString())
+                        {                            
+                            CreateNewEntry(null, true);
+                        }
+                    }
+                }
             }
         }
 
