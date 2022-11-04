@@ -13,7 +13,12 @@ enum QUESTION_TYPE
 	DISTANCE_BEARING,
 	BEARING_DISTANCE_SIGN, 
 	BEARING_SIGN, 
-	DISTANCE_SIGN
+	DISTANCE_SIGN,
+	DISTANCE_SPEED,
+	SPEED,
+	BEARING_SPEED,
+	SIGN_SPEED,
+	DISTANCE_SPEED_BEARING_SIGN
 };
 
 namespace MapTestGen
@@ -224,7 +229,7 @@ namespace MapTestGen
 				answer_string = i.ToString() + ". " + distance_answer.ToString() + "m /" + (distance_answer/1000).ToString() + "km\n";
 				Answers_List.Add(answer_string);
 
-				oGrid grid = new oGrid();
+				//oGrid grid = new oGrid();
 				//this.Source_Grid.position = grid.GetGridPosition(this.Source_Grid);
 				//this.Target_Grid.position = grid.GetGridPosition(this.Target_Grid);
 			}
@@ -289,6 +294,45 @@ namespace MapTestGen
 
 				string answer_string;
 				answer_string = i.ToString() + ". " + cs.Type.ToString() + "\n";
+				Answers_List.Add(answer_string);
+			}
+        }
+
+		private void SpeedQuestion(int amount, List<Grid> Grid_List)
+		{
+			// speed = distance / time 
+			// time = distance / speed
+			// yomping pace == 4km hour 
+			for (int i = 1; i < amount + 1; i++)
+			{
+				this.Source_Grid = Grid_List[RandomInt(1, Grid_List.Count)];
+				this.Target_Grid = Grid_List[RandomInt(1, Grid_List.Count)];
+
+				// allowign distance calc to be accurate
+				while (Source_Grid.designation != Target_Grid.designation || (this.Target_Grid.designation == "SX") || this.Source_Grid.designation == "SX")
+				{
+					this.Source_Grid = Grid_List[RandomInt(1, Grid_List.Count)];
+					this.Target_Grid = Grid_List[RandomInt(1, Grid_List.Count)];
+				}
+
+				this.Source_Grid.roamer_eastings = RandomInt(1, 100);
+				this.Source_Grid.roamer_northings = RandomInt(1, 100);
+				this.Target_Grid.roamer_eastings = RandomInt(1, 100);
+				this.Target_Grid.roamer_northings = RandomInt(1, 100);
+
+				int grid_distance = this.GetDistance();
+
+				string question_str;
+
+				string base_question = ". How long would it take you to travel from ";
+
+				int answer = grid_distance / 4;
+
+				question_str = i.ToString() + base_question + (this.Source_Grid.designation).ToString() + " " + this.Source_Grid.grid_s + " "
+				   + "to " + (this.Target_Grid.designation).ToString() + " " + this.Target_Grid.grid_s + " travelling at 4km an hour." +"\n";
+				Questions_List.Add(question_str);
+				string answer_string;
+				answer_string = i.ToString() + ". " + grid_distance + "hours" + "\n";
 				Answers_List.Add(answer_string);
 			}
         }

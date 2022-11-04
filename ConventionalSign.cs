@@ -46,16 +46,23 @@ namespace MapTestGen
 				// Check if file already exists. If yes, delete it.     
 				if (File.Exists(grid_storage))
 				{
-                    var confirmResult = MessageBox.Show("This grid is already added, do you want to overwrite it?", "Overwrite Previous Grid Data", MessageBoxButtons.YesNo);
-
-                    if (confirmResult == DialogResult.Yes)
+                    if(!silent)
                     {
-                        File.Delete(grid_storage);                        
+                        var confirmResult = MessageBox.Show("This grid is already added, do you want to overwrite it?", "Overwrite Previous Grid Data", MessageBoxButtons.YesNo);
+
+                        if (confirmResult == DialogResult.Yes)
+                        {
+                            File.Delete(grid_storage);
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
                     else
                     {
-                        return;
-                    }                    
+                        File.Delete(grid_storage);
+                    }
                 }
 
 				// Create a new file     
@@ -71,13 +78,16 @@ namespace MapTestGen
                 if(!silent)
 				    MessageBox.Show("Added successfuly!");
 
-                DataGridViewRow row = (DataGridViewRow)dgv.Rows[0].Clone();
-                row.Cells[0].Value = this.Grid_Reference.grid_s;
-                row.Cells[1].Value = Enum.GetName(typeof(ConventionalSigns), this.Type);
-                row.Cells[3].Value = this;
-                dgv.Rows.Add(row);
-                if(sign_list != null)
+                if(!silent)
+                {
+                    DataGridViewRow row = (DataGridViewRow)dgv.Rows[0].Clone();
+                    row.Cells[0].Value = this.Grid_Reference.grid_s;
+                    row.Cells[1].Value = Enum.GetName(typeof(ConventionalSigns), this.Type);
+                    row.Cells[3].Value = this;
+                    dgv.Rows.Add(row);
                     sign_list.Add(this);
+                }
+
             }
 			catch (Exception Ex)
 			{
@@ -142,21 +152,34 @@ namespace MapTestGen
             }
         }
 
-        // untested need to add to background thread
         public void UpdateComments()
         {
             foreach(DataGridViewRow row in dgv.Rows)
             {
-                if(row.Cells[2].Value != null)
+                ConventionalSign cs = (ConventionalSign)dgv.Rows[row.Index].Cells[3].Value;
+                if (row.Cells[2].Value != null)
                 {
-                    ConventionalSign cs = (ConventionalSign)dgv.Rows[row.Index].Cells[3].Value;
-                    if (cs.Comment != null)
+                    if(cs.Comment == null)
                     {
-                        if(cs.Comment != row.Cells[2].Value.ToString())
-                        {                            
-                            CreateNewEntry(null, true);
+                        cs.Comment = row.Cells[2].Value.ToString();
+                        cs.CreateNewEntry(null, true);
+                    }
+                    else
+                    {
+                        if (cs.Comment != row.Cells[2].Value.ToString())
+                        {
+                            cs.Comment = row.Cells[2].Value.ToString();
+                            cs.CreateNewEntry(null, true);
                         }
                     }
+                }
+                else
+                {
+                    if(cs.Comment != null)
+                    {
+                        cs.Comment = "";
+                        cs.CreateNewEntry(null, true);
+                    } 
                 }
             }
         }

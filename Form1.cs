@@ -71,7 +71,7 @@ namespace MapTestGen
                         row.Cells[0].Value = item.Grid_Reference.grid_s;
                         row.Cells[1].Value = Enum.GetName(typeof(ConventionalSigns), item.Type);
                         row.Cells[3].Value = item;
-                        //row.Cells["Column3"].Value = Enum.GetName(typeof(ConventionalSigns), item.Type);
+                        row.Cells[2].Value = item.Comment;
 
                         dataGridView1.Rows.Add(row);
                     }
@@ -320,6 +320,14 @@ namespace MapTestGen
         private void button3_Click_1(object sender, EventArgs e)
         {
 
+        }
+
+        private void button3_Click_2(object sender, EventArgs e)
+        {
+            ConventionalSign cg = new ConventionalSign();
+            cg.dgv = dataGridView1;
+
+            cg.UpdateComments();
         }
     }
 }
