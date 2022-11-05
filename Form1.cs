@@ -25,11 +25,13 @@ namespace MapTestGen
             InitializeWorkerThread();
 
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.AutoScaleMode = AutoScaleMode.Dpi;
+            this.
 
             // tabs 
             tabPage1.Text = "Question Generator";
             tabPage2.Text = "Grid Refernces";
-
+            tabPage3.Text = "Resections";
             this.groupBox1.Controls.Add(this.radioButton2);
             this.groupBox1.Controls.Add(this.radioButton1);
             this.groupBox1.Text = "Amount";
@@ -328,6 +330,22 @@ namespace MapTestGen
             cg.dgv = dataGridView1;
 
             cg.UpdateComments();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Form2 f2 = new Form2();
+            f2.Show();
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label8_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

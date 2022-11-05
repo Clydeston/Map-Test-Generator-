@@ -39,7 +39,7 @@ namespace MapTestGen
 
         public void CreateNewEntry(List<ConventionalSign> sign_list, bool silent = false)
         {
-			string grid_storage = @$"./Grids/{this.Filename}.txt";
+			string grid_storage = $"./Grids/{this.Filename}.txt";
 
 			try
 			{
